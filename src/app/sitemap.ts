@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { getAllKeywords } from "@/lib/keywords";
+import { featuredArticles } from "@/data/featuredArticles";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://simonwerdetail.info";
@@ -17,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/keywords`,
       lastModified,
       changeFrequency: "daily",
-      priority: 0.9,
+      priority: 0.95,
     },
     {
       url: `${baseUrl}/tools`,
@@ -44,6 +45,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
   ];
+
+  // 20 High-Priority Featured SEO Articles (Direct Root URLs)
+  const featuredDirectRoutes: MetadataRoute.Sitemap = featuredArticles.map((item) => ({
+    url: `${baseUrl}/${item.slug}`,
+    lastModified: new Date(item.updatedAt),
+    changeFrequency: "daily",
+    priority: 1.0,
+  }));
 
   // Tool specific routes
   const toolSlugs = [
@@ -73,14 +82,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  // All 200 keyword routes
+  // All keyword routes (/keywords/[slug])
   const allKeywords = getAllKeywords();
   const keywordRoutes: MetadataRoute.Sitemap = allKeywords.map((item) => ({
     url: `${baseUrl}/keywords/${item.slug}`,
     lastModified: new Date(item.updatedAt),
     changeFrequency: "weekly",
-    priority: 0.8,
+    priority: 0.85,
   }));
 
-  return [...staticRoutes, ...toolRoutes, ...keywordRoutes];
+  return [...staticRoutes, ...featuredDirectRoutes, ...toolRoutes, ...keywordRoutes];
 }

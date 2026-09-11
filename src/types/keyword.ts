@@ -12,6 +12,7 @@ export interface KeywordItem {
   id: number;
   slug: string;
   title: string;
+  focusKeyword?: string;
   category: string;
   categorySlug: string;
   snippet: string;

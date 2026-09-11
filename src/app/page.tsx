@@ -14,10 +14,12 @@ import {
   Radio, 
   FileText,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Target
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { featuredArticles } from "@/data/featuredArticles";
 
 export default function Home() {
   const [searchVal, setSearchVal] = useState("");
@@ -118,6 +120,65 @@ export default function Home() {
         </motion.form>
       </section>
 
+      {/* Featured 20 Top SEO Articles Section */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-200 dark:border-white/10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs font-semibold uppercase mb-3">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Trending Pakistan SIM Guides</span>
+            </div>
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white">
+              Essential SIM Ownership & Verification Guides
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Comprehensive official walkthroughs for CNIC check, PTA 668, Jazz, Zong, Telenor, and Ufone verification.
+            </p>
+          </div>
+          <Link href="/keywords" className="mt-4 md:mt-0 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+            <span>View All 200 Guides</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {featuredArticles.map((article, idx) => (
+            <Link key={article.slug} href={`/${article.slug}`}>
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: (idx % 8) * 0.03 }}
+                className="glass-card p-5 h-full rounded-2xl flex flex-col justify-between group hover:border-blue-500/50 hover:shadow-lg transition-all"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 font-semibold">
+                      Guide #{idx + 1}
+                    </span>
+                    {article.quickCode && (
+                      <span className="text-[11px] font-mono text-gray-400">
+                        {article.quickCode}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-500 transition-colors line-clamp-2">
+                    {article.title}
+                  </h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed mb-3">
+                    {article.snippet}
+                  </p>
+                </div>
+                <div className="pt-3 border-t border-gray-100 dark:border-white/10 flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
+                  <span>Read Guide</span>
+                  <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </div>
+              </motion.div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* 200 Guides Knowledge Base Section */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-200 dark:border-white/10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
@@ -127,7 +188,7 @@ export default function Home() {
               <span>Comprehensive Knowledge Base</span>
             </div>
             <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white">
-              Explore 200+ Telecom & SIM Guides
+              Explore by Telecom Topic
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
               Verified step-by-step solutions for Pakistani telecom networks and mobile users.
@@ -146,7 +207,7 @@ export default function Home() {
               count: "40 Guides",
               icon: <Smartphone className="w-6 h-6 text-blue-500" />,
               desc: "SIM ownership check, CNIC verification via 668, biometric BVS procedures, duplicate SIMs, and ownership transfer.",
-              link: "/keywords/sim-owner-details-online-check",
+              link: "/sim-owner-details-pakistan",
               tag: "PTA 668 & BVS"
             },
             {
@@ -154,7 +215,7 @@ export default function Home() {
               count: "35 Guides",
               icon: <Hash className="w-6 h-6 text-purple-500" />,
               desc: "Balance check codes, emergency loan/advance, credit share, remaining data & minutes for Jazz, Zong, Telenor, and Ufone.",
-              link: "/keywords/all-network-balance-check-code",
+              link: "/all-network-balance-check-code",
               tag: "*111#, *222#, *444#"
             },
             {
@@ -162,7 +223,7 @@ export default function Home() {
               count: "30 Guides",
               icon: <Shield className="w-6 h-6 text-emerald-500" />,
               desc: "IMEI registration via 8484, custom duty tax calculators, overseas temporary registration, and stolen phone blocking.",
-              link: "/keywords/pta-mobile-device-verification-online-dirbs",
+              link: "/pta-mobile-device-verification-online-dirbs",
               tag: "DIRBS & 8484"
             },
             {
@@ -170,7 +231,7 @@ export default function Home() {
               count: "35 Guides",
               icon: <Wifi className="w-6 h-6 text-amber-500" />,
               desc: "Best monthly 4G data packages, WhatsApp and YouTube bundles, all-in-one hybrid packages, and unsubscribe codes.",
-              link: "/keywords/jazz-monthly-call-packages-details",
+              link: "/jazz-monthly-call-packages-details",
               tag: "4G LTE Bundles"
             },
             {
@@ -178,7 +239,7 @@ export default function Home() {
               count: "30 Guides",
               icon: <Radio className="w-6 h-6 text-cyan-500" />,
               desc: "Digital eSIM activation, high-speed 4G/5G APN configuration, Wi-Fi calling, and international roaming bundles.",
-              link: "/keywords/what-is-esim-and-how-to-activate-in-pakistan",
+              link: "/what-is-esim-and-how-to-activate-in-pakistan",
               tag: "eSIM & High-Speed APN"
             },
             {
@@ -186,7 +247,7 @@ export default function Home() {
               count: "30 Guides",
               icon: <FileText className="w-6 h-6 text-rose-500" />,
               desc: "Spam call blocker codes, FIA cybercrime reporting, BISP scam protection, and developer utilities.",
-              link: "/keywords/how-to-block-spam-calls-and-marketing-sms",
+              link: "/how-to-block-spam-calls-and-marketing-sms",
               tag: "Anti-Spam & Security"
             },
           ].map((cat, idx) => (
