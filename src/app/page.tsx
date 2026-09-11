@@ -25,19 +25,10 @@ export default function Home() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const query = searchVal.trim();
-    if (!query) {
-      router.push("/keywords");
-      return;
-    }
-    // If user enters a phone number (e.g. 03225202988 or 92322... or 322...), route to the dedicated lookup tool!
-    const cleanDigits = query.replace(/\D/g, "");
-    if ((cleanDigits.startsWith("03") && cleanDigits.length >= 10) || 
-        (cleanDigits.startsWith("923") && cleanDigits.length >= 11) || 
-        (cleanDigits.startsWith("3") && cleanDigits.length === 10)) {
-      router.push(`/tools/sim-database-lookup?number=${encodeURIComponent(cleanDigits)}`);
+    if (searchVal.trim()) {
+      router.push(`/keywords?q=${encodeURIComponent(searchVal.trim())}`);
     } else {
-      router.push(`/keywords?q=${encodeURIComponent(query)}`);
+      router.push("/keywords");
     }
   };
 
@@ -302,10 +293,10 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             {
-              title: "Live SIM Record Lookup",
-              description: "Live query for mobile records with automated 92 international prefixing.",
+              title: "SIM Format Validator",
+              description: "Validate ICCID format and extract telecom provider information globally.",
               icon: <Smartphone className="w-6 h-6 text-blue-500" />,
-              path: "/tools/sim-database-lookup"
+              path: "/tools/sim-format-validator"
             },
             {
               title: "IP Address Lookup",
