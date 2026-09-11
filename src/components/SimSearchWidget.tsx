@@ -15,8 +15,10 @@ import {
   AlertCircle, 
   Globe, 
   Code, 
-  Sparkles,
-  ExternalLink
+  ExternalLink,
+  WifiOff,
+  Building,
+  Radio
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -140,7 +142,7 @@ export default function SimSearchWidget({ initialNumber = "", embedded = false }
         <div className="flex flex-wrap items-center justify-between text-xs text-gray-500 dark:text-gray-400 px-2 mt-2 gap-2">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Backend Auto-Format: Automatically converts numbers to 923XXXXXXXXX</span>
+            <span>Backend Auto-Format: Automatically converts number to 923XXXXXXXXX</span>
           </div>
           <div className="flex items-center gap-2">
             <span>Try sample:</span>
@@ -177,9 +179,9 @@ export default function SimSearchWidget({ initialNumber = "", embedded = false }
               {/* Header Status Bar */}
               <div className="flex flex-wrap items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-200 dark:border-white/10">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>Query Completed</span>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                    <span>{result.records && result.records.length > 0 ? "Record Found" : "Query Processed"}</span>
                   </div>
                   <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white font-mono">
                     {result.displayNumber || result.formattedNumber}
@@ -205,60 +207,116 @@ export default function SimSearchWidget({ initialNumber = "", embedded = false }
                 </div>
               </div>
 
-              {/* Data Grid / Records Display */}
+              {/* Notice when Upstream server is down / timeout */}
+              {result.isUpstreamDown && (
+                <div className="p-4 mb-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-sm flex items-start gap-3">
+                  <WifiOff className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <div className="leading-relaxed">
+                    <strong className="block font-bold mb-1">External Database Server (aichatbot.pk) Offline / Unreachable</strong>
+                    The external server hosting <code className="font-mono text-xs bg-black/10 dark:bg-black/30 px-1 py-0.5 rounded">https://aichatbot.pk/api/search_data.php</code> is currently not answering network connection requests (timeout). As soon as the host activates or fixes their database server, records will display automatically here.
+                  </div>
+                </div>
+              )}
+
+              {/* Notice when No Record is found in database */}
+              {!result.isUpstreamDown && (!result.records || result.records.length === 0) && (
+                <div className="p-4 mb-6 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-900 dark:text-blue-200 text-sm flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <div className="leading-relaxed">
+                    <strong className="block font-bold mb-1">No Record Found in Database</strong>
+                    The API responded but no registered subscriber record was found for <span className="font-mono font-semibold">{result.displayNumber}</span>. Please verify the number or try another mobile connection.
+                  </div>
+                </div>
+              )}
+
+              {/* Data Grid / Records Display (If Found) */}
               {result.records && result.records.length > 0 ? (
                 <div className="space-y-4">
                   {result.records.map((rec: any, idx: number) => (
                     <div
                       key={idx}
-                      className="p-5 rounded-2xl bg-gray-50/80 dark:bg-white/5 border border-gray-100 dark:border-white/5 grid grid-cols-1 sm:grid-cols-2 gap-4"
+                      className="p-6 rounded-2xl bg-gray-50/90 dark:bg-white/5 border border-gray-200 dark:border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-5 shadow-sm"
                     >
                       {rec.name && (
-                        <div className="flex items-start gap-3">
-                          <User className="w-5 h-5 text-blue-500 mt-0.5" />
+                        <div className="flex items-start gap-3.5">
+                          <div className="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+                            <User className="w-5 h-5" />
+                          </div>
                           <div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">Full Name</span>
-                            <div className="text-base font-bold text-gray-900 dark:text-white font-mono">{rec.name}</div>
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Subscriber Name</span>
+                            <div className="text-base font-bold text-gray-900 dark:text-white uppercase tracking-wide">{rec.name}</div>
                           </div>
                         </div>
                       )}
 
                       {rec.cnic && (
-                        <div className="flex items-start gap-3">
-                          <CreditCard className="w-5 h-5 text-purple-500 mt-0.5" />
+                        <div className="flex items-start gap-3.5">
+                          <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0">
+                            <CreditCard className="w-5 h-5" />
+                          </div>
                           <div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">CNIC Number</span>
-                            <div className="text-base font-bold text-gray-900 dark:text-white font-mono">{rec.cnic}</div>
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">CNIC Number</span>
+                            <div className="text-base font-bold text-gray-900 dark:text-white font-mono tracking-wider">{rec.cnic}</div>
                           </div>
                         </div>
                       )}
 
                       {rec.number && (
-                        <div className="flex items-start gap-3">
-                          <Smartphone className="w-5 h-5 text-emerald-500 mt-0.5" />
+                        <div className="flex items-start gap-3.5">
+                          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+                            <Smartphone className="w-5 h-5" />
+                          </div>
                           <div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">Mobile Number</span>
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Registered Number</span>
                             <div className="text-base font-bold text-gray-900 dark:text-white font-mono">{rec.number}</div>
                           </div>
                         </div>
                       )}
 
-                      {rec.address && (
-                        <div className="flex items-start gap-3 sm:col-span-2">
-                          <MapPin className="w-5 h-5 text-rose-500 mt-0.5" />
+                      {rec.operator && (
+                        <div className="flex items-start gap-3.5">
+                          <div className="w-9 h-9 rounded-xl bg-pink-500/10 text-pink-600 dark:text-pink-400 flex items-center justify-center flex-shrink-0">
+                            <Radio className="w-5 h-5" />
+                          </div>
                           <div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">Address / City</span>
-                            <div className="text-sm font-medium text-gray-900 dark:text-white leading-relaxed">{rec.address}</div>
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Network Operator</span>
+                            <div className="text-base font-bold text-gray-900 dark:text-white">{rec.operator}</div>
+                          </div>
+                        </div>
+                      )}
+
+                      {rec.city && (
+                        <div className="flex items-start gap-3.5">
+                          <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center flex-shrink-0">
+                            <Building className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">City / Circle</span>
+                            <div className="text-sm font-semibold text-gray-900 dark:text-white">{rec.city}</div>
                           </div>
                         </div>
                       )}
 
                       {rec.date && (
-                        <div className="flex items-start gap-3">
-                          <Calendar className="w-5 h-5 text-amber-500 mt-0.5" />
+                        <div className="flex items-start gap-3.5">
+                          <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
+                            <Calendar className="w-5 h-5" />
+                          </div>
                           <div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">Record Date</span>
-                            <div className="text-sm font-mono text-gray-800 dark:text-gray-200">{rec.date}</div>
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Issue / Registration Date</span>
+                            <div className="text-sm font-mono text-gray-900 dark:text-white">{rec.date}</div>
+                          </div>
+                        </div>
+                      )}
+
+                      {rec.address && (
+                        <div className="flex items-start gap-3.5 sm:col-span-2 pt-2 border-t border-gray-200 dark:border-white/10">
+                          <div className="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1">
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Registered Residential Address</span>
+                            <div className="text-sm font-medium text-gray-900 dark:text-white leading-relaxed mt-0.5">{rec.address}</div>
                           </div>
                         </div>
                       )}
@@ -269,7 +327,7 @@ export default function SimSearchWidget({ initialNumber = "", embedded = false }
                 /* Fallback & Normalized Carrier Information */
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                   <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-white/5 border border-gray-100 dark:border-white/5">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Carrier Network</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Detected Network</span>
                     <div className="text-lg font-bold text-gray-900 dark:text-white mt-1">
                       {result.carrier?.carrier || "Pakistani Mobile"}
                     </div>
@@ -277,30 +335,30 @@ export default function SimSearchWidget({ initialNumber = "", embedded = false }
                   </div>
 
                   <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-white/5 border border-gray-100 dark:border-white/5">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">International MSISDN</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">International Format</span>
                     <div className="text-lg font-bold text-gray-900 dark:text-white font-mono mt-1">
                       +{result.formattedNumber}
                     </div>
-                    <span className="text-xs text-emerald-500 font-mono mt-0.5 block">92 Format Defined</span>
+                    <span className="text-xs text-emerald-500 font-mono mt-0.5 block">92 Defined on Backend</span>
                   </div>
 
                   <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-white/5 border border-gray-100 dark:border-white/5">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Biometric Authority</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Biometric Verification</span>
                     <div className="text-lg font-bold text-gray-900 dark:text-white mt-1">
                       PTA & NADRA BVS
                     </div>
-                    <span className="text-xs text-purple-500 font-mono mt-0.5 block">Verified Format</span>
+                    <span className="text-xs text-purple-500 font-mono mt-0.5 block">Standard Format</span>
                   </div>
                 </div>
               )}
 
-              {/* API Details Footer */}
+              {/* API Diagnostics Footer */}
               <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/5 flex flex-wrap items-center justify-between text-xs text-gray-500 dark:text-gray-400 gap-2">
                 <div className="flex items-center gap-2">
                   <Globe className="w-3.5 h-3.5 text-blue-500" />
-                  <span>Target API Endpoint: <code className="font-mono text-gray-700 dark:text-gray-300">https://aichatbot.pk/api/search_data.php?query={result.formattedNumber}&type=mobile</code></span>
+                  <span>Target API Endpoint: <code className="font-mono text-gray-700 dark:text-gray-300">{result.hitUrl || `https://aichatbot.pk/api/search_data.php?query=${result.formattedNumber}&type=mobile`}</code></span>
                 </div>
-                <div>Status: <span className="font-semibold text-emerald-500">200 OK</span></div>
+                <div>Status: <span className={`font-semibold ${result.isUpstreamDown ? "text-amber-500" : "text-emerald-500"}`}>{result.isUpstreamDown ? "Upstream Unreachable" : "200 OK"}</span></div>
               </div>
 
               {/* Raw JSON viewer */}
@@ -322,7 +380,7 @@ export default function SimSearchWidget({ initialNumber = "", embedded = false }
                 <ShieldCheck className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                   <span className="font-bold block text-gray-900 dark:text-white">Official Self-Verification Shortcode</span>
-                  To verify the registered subscriber details of your active SIM card, send an SMS with <strong className="font-mono text-blue-600 dark:text-blue-400">MNP</strong> to <strong className="font-mono text-blue-600 dark:text-blue-400">667</strong>.
+                  To verify the registered subscriber details of your active SIM card directly, send an SMS with <strong className="font-mono text-blue-600 dark:text-blue-400">MNP</strong> to <strong className="font-mono text-blue-600 dark:text-blue-400">667</strong>.
                 </div>
               </div>
               <a
