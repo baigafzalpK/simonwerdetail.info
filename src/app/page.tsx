@@ -13,27 +13,31 @@ import {
   Wifi, 
   Radio, 
   FileText,
-  CheckCircle2,
-  Sparkles,
-  Target,
-  Database
+  Sparkles
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { featuredArticles } from "@/data/featuredArticles";
-import SimSearchWidget from "@/components/SimSearchWidget";
 
 export default function Home() {
-  const [searchMode, setSearchMode] = useState<"live" | "guides">("live");
   const [searchVal, setSearchVal] = useState("");
   const router = useRouter();
 
-  const handleGuidesSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchVal.trim()) {
-      router.push(`/keywords?q=${encodeURIComponent(searchVal.trim())}`);
-    } else {
+    const query = searchVal.trim();
+    if (!query) {
       router.push("/keywords");
+      return;
+    }
+    // If user enters a phone number (e.g. 03225202988 or 92322... or 322...), route to the dedicated lookup tool!
+    const cleanDigits = query.replace(/\D/g, "");
+    if ((cleanDigits.startsWith("03") && cleanDigits.length >= 10) || 
+        (cleanDigits.startsWith("923") && cleanDigits.length >= 11) || 
+        (cleanDigits.startsWith("3") && cleanDigits.length === 10)) {
+      router.push(`/tools/sim-database-lookup?number=${encodeURIComponent(cleanDigits)}`);
+    } else {
+      router.push(`/keywords?q=${encodeURIComponent(query)}`);
     }
   };
 
@@ -47,7 +51,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-20 flex flex-col items-center text-center">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 flex flex-col items-center text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -56,7 +60,7 @@ export default function Home() {
         >
           <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
           <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-            Live SIM Record Lookup API & 200+ Guides
+            200+ Telecom Guides & USSD Codes Now Published
           </span>
         </motion.div>
 
@@ -77,65 +81,50 @@ export default function Home() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="max-w-2xl text-xl text-gray-600 dark:text-gray-400 mb-10 leading-relaxed"
         >
-          Live mobile number lookup with automated 92 international prefixing, carrier detection, and 200+ verified PTA & telecom guides.
+          Explore the most comprehensive directory of 200+ verified guides, USSD dial codes, SIM ownership checks, PTA DIRBS verification, and developer utilities.
         </motion.p>
 
-        {/* Search Mode Toggle Tabs */}
-        <div className="inline-flex p-1.5 rounded-2xl bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/10 mb-6 shadow-sm">
-          <button
-            onClick={() => setSearchMode("live")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              searchMode === "live"
-                ? "bg-blue-600 text-white shadow-md shadow-blue-500/25"
-                : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            }`}
-          >
-            <Database className="w-4 h-4" />
-            <span>Live Number Search (API)</span>
-          </button>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-md mx-auto"
+        >
+          <Link href="/keywords" className="flex-1">
+            <button className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-1 transition-all duration-300">
+              Browse 200 Guides <ArrowRight className="w-4 h-4" />
+            </button>
+          </Link>
+          <Link href="/tools" className="flex-1">
+            <button className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-white dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-900 dark:text-white rounded-xl font-semibold shadow-sm hover:bg-gray-50 dark:hover:bg-white/20 transition-all duration-300 backdrop-blur-md">
+              Developer Tools
+            </button>
+          </Link>
+        </motion.div>
 
-          <button
-            onClick={() => setSearchMode("guides")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              searchMode === "guides"
-                ? "bg-blue-600 text-white shadow-md shadow-blue-500/25"
-                : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            }`}
+        {/* Original Clean Global Search Area */}
+        <motion.form
+          onSubmit={handleSearch}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="w-full max-w-3xl mt-16 p-2 glass-card rounded-2xl flex items-center shadow-xl border border-gray-200 dark:border-white/10"
+        >
+          <div className="p-4"><Search className="text-gray-400 w-6 h-6" /></div>
+          <input 
+            type="text" 
+            value={searchVal}
+            onChange={(e) => setSearchVal(e.target.value)}
+            placeholder="Search SIM check, USSD (*111#, 668), PTA tax, APN, packages..." 
+            className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white text-base sm:text-lg placeholder-gray-400 dark:placeholder-gray-500 py-3 px-2"
+          />
+          <button 
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors hidden sm:block mr-2 shadow-md shadow-blue-500/25"
           >
-            <Search className="w-4 h-4" />
-            <span>Search 200 Guides</span>
+            Search Guides
           </button>
-        </div>
-
-        {/* Search Focus Area */}
-        <div className="w-full max-w-3xl">
-          {searchMode === "live" ? (
-            <SimSearchWidget initialNumber="03225202988" embedded={true} />
-          ) : (
-            <motion.form
-              onSubmit={handleGuidesSearch}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4 }}
-              className="w-full p-2 glass-card rounded-2xl flex items-center shadow-xl border border-gray-200 dark:border-white/10"
-            >
-              <div className="p-4"><Search className="text-gray-400 w-6 h-6" /></div>
-              <input 
-                type="text" 
-                value={searchVal}
-                onChange={(e) => setSearchVal(e.target.value)}
-                placeholder="Search SIM check, USSD (*111#, 668), PTA tax, APN, packages..." 
-                className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white text-base sm:text-lg placeholder-gray-400 dark:placeholder-gray-500 py-3 px-2"
-              />
-              <button 
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors hidden sm:block mr-2 shadow-md shadow-blue-500/25"
-              >
-                Search Guides
-              </button>
-            </motion.form>
-          )}
-        </div>
+        </motion.form>
       </section>
 
       {/* Featured 20 Top SEO Articles Section */}

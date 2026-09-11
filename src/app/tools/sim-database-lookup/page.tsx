@@ -1,8 +1,7 @@
 import React from "react";
 import { Metadata } from "next";
 import SimSearchWidget from "@/components/SimSearchWidget";
-import { Smartphone, ShieldCheck, Database, Zap, FileText } from "lucide-react";
-import Link from "next/link";
+import { Smartphone, ShieldCheck, Database, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Live Mobile Number & SIM Record Search | SIM Utility Hub",
@@ -10,7 +9,14 @@ export const metadata: Metadata = {
   keywords: ["sim record search", "pakistan mobile number lookup", "live sim tracker api", "sim database search"],
 };
 
-export default function SimDatabaseLookupPage() {
+interface PageProps {
+  searchParams: Promise<{ number?: string; query?: string }>;
+}
+
+export default async function SimDatabaseLookupPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const initialNumber = params?.number || params?.query || "03225202988";
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Header */}
@@ -30,7 +36,7 @@ export default function SimDatabaseLookupPage() {
       </div>
 
       {/* Interactive Search Engine Widget */}
-      <SimSearchWidget initialNumber="03225202988" />
+      <SimSearchWidget initialNumber={initialNumber} />
 
       {/* Feature Explanations & FAQ */}
       <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
