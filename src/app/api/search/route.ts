@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 // Helper to determine network operator from Pakistani mobile prefix
 function getCarrierInfo(numberStr: string): { carrier: string; brand: string; color: string } {
   let num = numberStr.replace(/\D/g, "");
