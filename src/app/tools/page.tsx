@@ -15,6 +15,7 @@ const categories = [
 ];
 
 const tools = [
+  { name: "Live SIM Record Lookup", category: "Telecom Utilities", icon: <Smartphone className="w-5 h-5" />, path: "/tools/sim-database-lookup", desc: "Live API query for mobile records with auto 92 prefix formatting." },
   { name: "SIM Format Validator", category: "Telecom Utilities", icon: <Smartphone className="w-5 h-5" />, path: "/tools/sim-format-validator", desc: "Check ICCID format validity." },
   { name: "Mobile Number Validator", category: "Telecom Utilities", icon: <Smartphone className="w-5 h-5" />, path: "/tools/mobile-number-validator", desc: "Validate numbers globally." },
   { name: "Password Generator", category: "Security Tools", icon: <Shield className="w-5 h-5" />, path: "/tools/password-generator", desc: "Create secure passwords." },
